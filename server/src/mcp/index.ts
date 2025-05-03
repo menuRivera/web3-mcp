@@ -150,9 +150,9 @@ mcp.resource(
 mcp.tool(
 	"connectWallet",
 	async () => {
-		const success = await connectWallet()
+		const res = await connectWallet()
 		return {
-			content: [{ type: "text", text: `Wallet connected: ${success}` }]
+			content: [{ type: "text", text: `Wallet connected: ${res.success}` }]
 		}
 	},
 )

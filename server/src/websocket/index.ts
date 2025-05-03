@@ -1,7 +1,10 @@
 import { Server } from "socket.io";
 import type { IMessageToServer } from "../types/messageToServer.type";
+import { createServer } from "http";
+import type { ICallbackParams } from "../types/callback.type";
 
-export const io = new Server({
+const httpServer = createServer();
+const io = new Server(httpServer, {
 	cors: {
 		origin: '*',
 		methods: ['GET', 'POST'],
@@ -9,11 +12,21 @@ export const io = new Server({
 });
 
 io.on("connection", (socket) => {
-	console.log(`Socket connected ${socket.id}`)
-
 	socket.on('messageToServer', async (msg: IMessageToServer) => {
-		console.log(msg)
-	})
+		// Handle messageToServer event
+	});
 
-	// attach event listeners
+	socket.on('connectWallet', (callback: (response: ICallbackParams) => void) => {
+		// Here you would implement your wallet connection logic
+		// For now, we'll just acknowledge with a success response
+		if (typeof callback === 'function') {
+			const response: ICallbackParams = {
+				success: true,
+				data: null
+			};
+			callback(response);
+		}
+	});
 });
+
+export { io, httpServer };

@@ -1,13 +1,25 @@
-import { io } from ".."
-import type { ICallbackParams } from "../../types/callback.type"
-import type { IStatus } from "../../types/status.type"
+import { io } from "..";
+import type { ICallbackParams } from "../../types/callback.type";
 
-export const connectWallet = (): Promise<IStatus> => {
-	return new Promise((resolve) => {
-		io.emit('connectWallet', ({ success, data }: ICallbackParams<IStatus>,) => {
-			if (success) resolve(data)
-		})
-	})
-}
+export const connectWallet = (): Promise<ICallbackParams> => {
+	return new Promise((resolve, reject) => {
+		// Get the first connected socket
+		const sockets = Array.from(io.sockets.sockets.values());
+		if (sockets.length === 0) {
+			reject(new Error("No connected clients"));
+			return;
+		}
 
+		const socket = sockets[0];
 
+		// Set a timeout for the acknowledgment
+		const timeout = setTimeout(() => {
+			reject(new Error("Operation has timed out"));
+		}, 5000); // 5 second timeout
+
+		socket.emit('connectWallet', (response: ICallbackParams) => {
+			clearTimeout(timeout);
+			resolve(response);
+		});
+	});
+};

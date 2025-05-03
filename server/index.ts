@@ -1,10 +1,12 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { mcp } from "./src/mcp";
-import { io } from "./src/websocket";
+import { io, httpServer } from "./src/websocket";
 
-const PORT = 65001
+const PORT = 65001;
 
+// Start MCP server
 const transport = new StdioServerTransport();
-await mcp.connect(transport)
+await mcp.connect(transport);
 
-io.listen(PORT);
+// Start Socket.IO server
+httpServer.listen(PORT, () => { });

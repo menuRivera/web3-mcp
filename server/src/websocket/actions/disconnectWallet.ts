@@ -3,8 +3,8 @@ import type { ICallbackParams } from "../../types/callback.type"
 
 export const disconnectWallet = (): Promise<boolean> => {
 	return new Promise((resolve) => {
-		io.emit('disconnectWallet', ({ success }: ICallbackParams) => {
-			resolve(success)
+		io.emit('disconnectWallet', (res: ICallbackParams) => {
+			resolve(res.success)
 		})
 	})
 }
