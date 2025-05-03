@@ -2,16 +2,15 @@
 
 import Image from "next/image";
 import styles from "./page.module.css";
-import ConnectWallet from "./components/connectWallet";
-import WalletConnector from "./components/SocketProvider";
+import { useSocket } from "./hooks/useSocket";
 
 export default function Home() {
+  useSocket();
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-       <h1>Keep the windows open, please</h1>
-       <ConnectWallet></ConnectWallet>
-       <WalletConnector></WalletConnector>
+        <h1>Keep the windows open, please</h1>
       </main>
       <footer className={styles.footer}>
        
