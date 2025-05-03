@@ -1,0 +1,20 @@
+{
+  "name": "extension",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/web3": "^1.2.2"
+  },
+  "scripts": {
+    "build": "bun run build-ts",
+    "build-ts": "tsc"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/firefox-webext-browser": "^120.0.4"
+  }
+}
