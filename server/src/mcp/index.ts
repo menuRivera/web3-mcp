@@ -1,13 +1,14 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-export const server = new McpServer({
+// create mcp server and setup tools and resources
+
+export const mcp = new McpServer({
 	name: "web3-mcp-server",
 	version: "1.0.0"
 });
 
-server.tool(
+mcp.tool(
 	"add",
 	{ a: z.number(), b: z.number() },
 	async ({ a, b }) => ({
@@ -15,7 +16,7 @@ server.tool(
 	}),
 );
 
-server.resource(
+mcp.resource(
 	"greeting",
 	new ResourceTemplate("greeting://{name}", { list: undefined }),
 	async (uri, { name }) => ({
@@ -26,7 +27,7 @@ server.resource(
 	})
 );
 
-server.tool(
+mcp.tool(
 	'multiply two numbers',
 	{ a: z.number(), b: z.number(), },
 	async ({ a, b }) => {
@@ -39,8 +40,3 @@ server.tool(
 	}
 )
 
-const transport = new StdioServerTransport();
-await server.connect(transport)
-
-
-console.log('MCP server running...')
