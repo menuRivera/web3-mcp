@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ICallbackParams } from '../types/callback.type';
+import { BrowserProvider } from 'ethers';
 
 const SOCKET_URL = 'ws://localhost:65001';
 
@@ -17,10 +17,34 @@ export const useSocket = () => {
 		});
 
 		// Listen for walletConnect event
-		socketRef.current.on('connectWallet', (callback) => {
-			console.log('connectWallet triggered')
-			// connect ethereum wallet
-			callback({ success: true, data: null })
+		socketRef.current.on('connectWallet', async (callback) => {
+			console.log('connectWallet triggeredddd')
+			// Request wallet connection using ethers
+			try {
+				if (!window.ethereum) {
+					throw new Error('No crypto wallet found. Please install MetaMask.');
+				}
+
+				// Create a BrowserProvider instance
+				const provider = new BrowserProvider(window.ethereum);
+
+				// Request account access
+				const accounts = await provider.send('eth_requestAccounts', []);
+
+				if (!accounts || accounts.length === 0) {
+					throw new Error('No accounts found');
+				}
+
+				const address = accounts[0];
+				console.log('Wallet connected:', address);
+				callback({ success: true, data: null })
+			} catch (error) {
+				console.error('Error connecting wallet:', error);
+				callback({
+					success: false,
+					error: error instanceof Error ? error.message : 'Failed to connect wallet'
+				});
+			}
 		});
 
 		// Cleanup on unmount

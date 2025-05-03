@@ -16,17 +16,17 @@ io.on("connection", (socket) => {
 		// Handle messageToServer event
 	});
 
-	socket.on('connectWallet', (callback: (response: ICallbackParams) => void) => {
-		// Here you would implement your wallet connection logic
-		// For now, we'll just acknowledge with a success response
-		if (typeof callback === 'function') {
-			const response: ICallbackParams = {
-				success: true,
-				data: null
-			};
-			callback(response);
-		}
-	});
+	// socket.on('connectWallet', (callback: (response: ICallbackParams) => void) => {
+	// 	// Here you would implement your wallet connection logic
+	// 	// For now, we'll just acknowledge with a success response
+	// 	if (typeof callback === 'function') {
+	// 		const response: ICallbackParams = {
+	// 			success: true,
+	// 			data: null
+	// 		};
+	// 		callback(response);
+	// 	}
+	// });
 });
 
 export { io, httpServer };
