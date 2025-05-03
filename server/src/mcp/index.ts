@@ -16,4 +16,4 @@ mcp.tool(
 			content: [{ type: "text", text: `Wallet connected: ${success}` }]
 		}
 	},
-);
+)

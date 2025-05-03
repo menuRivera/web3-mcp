@@ -2,12 +2,10 @@ import { io } from ".."
 import type { ICallbackParams } from "../../types/callback.type"
 import type { IStatus } from "../../types/status.type"
 
-export const connectWallet = (): Promise<IStatus> => {
+export const getStatus = (): Promise<IStatus> => {
 	return new Promise((resolve) => {
-		io.emit('connectWallet', ({ success, data }: ICallbackParams<IStatus>,) => {
+		io.emit('getStatus', ({ success, data }: ICallbackParams<IStatus>) => {
 			if (success) resolve(data)
 		})
 	})
 }
-
-
