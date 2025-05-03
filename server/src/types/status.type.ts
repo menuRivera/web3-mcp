@@ -1,7 +1,7 @@
 import type { INetwork } from "./network.type";
 
 export interface IStatus {
-	activeWallet: string,
+	activeAccount: string,
 	accounts: string[],
 	network: INetwork
 }
