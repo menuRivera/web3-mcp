@@ -1,6 +1,6 @@
-/*import { socket } from ".";
+import {getSocket} from "./index";
+import { Socket } from 'socket.io-client';
 
 
-socket.on("connectWallet", async (cb?:string)=>{
-    console.log("hi");
-});*/
+let socket: Socket = getSocket();
+
