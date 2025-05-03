@@ -1,6 +1,6 @@
 import { io } from ".."
-import type { ICallbackParams } from "../../types/callback.type"
-import type { IStatus } from "../../types/status.type"
+import type { ICallbackParams } from "@shared/callback.type"
+import type { IStatus } from "@shared/status.type"
 
 export const getStatus = (): Promise<IStatus> => {
 	return new Promise((resolve) => {

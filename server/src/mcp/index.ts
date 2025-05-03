@@ -8,11 +8,11 @@ import {
 	queryContractState,
 	getStatus
 } from "../websocket/actions";
-import type { INetwork } from "../types/network.type";
-import type { IStatus } from "../types/status.type";
+import type { INetwork } from "@shared/network.type";
+import type { IStatus } from "@shared/status.type";
 import { z } from "zod";
 import { chains } from "../config/chains";
-import type { IContractResource } from "../types/resources.type";
+import type { IContractResource } from "@shared/resources.type";
 
 // Mock contract data
 const contracts: Record<string, IContractResource> = {

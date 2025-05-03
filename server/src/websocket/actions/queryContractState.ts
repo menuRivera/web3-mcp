@@ -1,5 +1,5 @@
 import { io } from ".."
-import type { ICallbackParams } from "../../types/callback.type"
+import type { ICallbackParams } from "@shared/callback.type"
 
 export const queryContractState = <T>(contractAddress: string, functionName: string, abi: any[], args: string[]): Promise<T> => {
 	return new Promise((resolve) => {

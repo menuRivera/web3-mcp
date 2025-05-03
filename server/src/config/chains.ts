@@ -1,4 +1,4 @@
-import type { IChainResource } from "../types/resources.type";
+import type { IChainResource } from "@shared/resources.type";
 
 export const chains: Record<string, IChainResource> = {
     "ethereum": {

@@ -1,6 +1,6 @@
 import { io } from ".."
-import type { ICallbackParams } from "../../types/callback.type"
-import type { INetwork } from "../../types/network.type"
+import type { ICallbackParams } from "@shared/callback.type"
+import type { INetwork } from "@shared/network.type"
 
 export const changeNetwork = (network: INetwork): Promise<boolean> => {
 	return new Promise((resolve) => {

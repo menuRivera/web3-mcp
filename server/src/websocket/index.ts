@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
-import type { IMessageToServer } from "../types/messageToServer.type";
 import { createServer } from "http";
-import type { ICallbackParams } from "../types/callback.type";
+import type { IMessageToServer } from "@shared/messageToServer.type";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -13,6 +12,7 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
 	socket.on('messageToServer', async (msg: IMessageToServer) => {
+
 		// Handle messageToServer event
 	});
 

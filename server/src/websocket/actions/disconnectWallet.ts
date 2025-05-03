@@ -1,5 +1,5 @@
 import { io } from ".."
-import type { ICallbackParams } from "../../types/callback.type"
+import type { ICallbackParams } from "@shared/callback.type"
 
 export const disconnectWallet = (): Promise<boolean> => {
 	return new Promise((resolve) => {
