@@ -1,5 +1,5 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { connectWallet } from "../websocket/actions/connectWallet";
 
 // create mcp server and setup tools and resources
 
@@ -9,34 +9,11 @@ export const mcp = new McpServer({
 });
 
 mcp.tool(
-	"add",
-	{ a: z.number(), b: z.number() },
-	async ({ a, b }) => ({
-		content: [{ type: "text", text: String(a + b) }]
-	}),
-);
-
-mcp.resource(
-	"greeting",
-	new ResourceTemplate("greeting://{name}", { list: undefined }),
-	async (uri, { name }) => ({
-		contents: [{
-			uri: uri.href,
-			text: `Hello, ${name}!`
-		}]
-	})
-);
-
-mcp.tool(
-	'multiply two numbers',
-	{ a: z.number(), b: z.number(), },
-	async ({ a, b }) => {
+	"connectWallet",
+	async () => {
+		const success = await connectWallet()
 		return {
-			content: [{
-				type: 'text',
-				text: String(a * b)
-			}]
+			content: [{ type: "text", text: `Wallet connected: ${success}` }]
 		}
-	}
-)
-
+	},
+);
