@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { BrowserProvider } from 'ethers';
 import type { ICallbackParams } from '@shared/callback.type';
@@ -7,17 +7,78 @@ import type { INetwork } from '@shared/network.type';
 
 const SOCKET_URL = 'ws://localhost:65001';
 
+// Create a single socket instance at module level
+let socketInstance: Socket | null = null;
+
+// Connection options
+const socketOptions = {
+	reconnection: true,
+	reconnectionAttempts: Infinity,
+	reconnectionDelay: 1000,
+	reconnectionDelayMax: 5000,
+	timeout: 20000,
+	autoConnect: true,
+	forceNew: false,
+	transports: ['websocket', 'polling']
+};
+
 export const useSocket = () => {
 	const socketRef = useRef<Socket | null>(null);
+	const [isConnected, setIsConnected] = useState(false);
 
 	useEffect(() => {
-		// Initialize socket connection
-		socketRef.current = io(SOCKET_URL);
+		// Initialize socket connection only if it doesn't exist
+		if (!socketInstance) {
+			socketInstance = io(SOCKET_URL, socketOptions);
+		}
+		socketRef.current = socketInstance;
+
+		// Set initial connection state
+		setIsConnected(socketRef.current.connected);
 
 		// Listen for connect event
-		socketRef.current.on('connect', () => {
+		const handleConnect = () => {
 			console.log('Socket connected:', socketRef.current?.id);
-		});
+			setIsConnected(true);
+		};
+
+		// Listen for disconnect event
+		const handleDisconnect = () => {
+			console.log('Socket disconnected');
+			setIsConnected(false);
+		};
+
+		// Listen for connect_error event
+		const handleConnectError = (error: Error) => {
+			console.error('Socket connection error:', error);
+			setIsConnected(false);
+		};
+
+		// Listen for reconnect event
+		const handleReconnect = (attemptNumber: number) => {
+			console.log('Socket reconnected after', attemptNumber, 'attempts');
+			setIsConnected(true);
+		};
+
+		// Listen for reconnect_error event
+		const handleReconnectError = (error: Error) => {
+			console.error('Socket reconnection error:', error);
+			setIsConnected(false);
+		};
+
+		// Listen for reconnect_failed event
+		const handleReconnectFailed = () => {
+			console.error('Socket reconnection failed');
+			setIsConnected(false);
+		};
+
+		// Add event listeners
+		socketRef.current.on('connect', handleConnect);
+		socketRef.current.on('disconnect', handleDisconnect);
+		socketRef.current.on('connect_error', handleConnectError);
+		socketRef.current.on('reconnect', handleReconnect);
+		socketRef.current.on('reconnect_error', handleReconnectError);
+		socketRef.current.on('reconnect_failed', handleReconnectFailed);
 
 		// Listen for getStatus event
 		socketRef.current.on('getStatus', async (callback: (response: ICallbackParams<IStatus | null>) => void) => {
@@ -39,8 +100,6 @@ export const useSocket = () => {
 				if (!accounts || accounts.length === 0) {
 					throw new Error('No accounts found');
 				}
-				// Get token data from the network
-				const feeData = await provider.getFeeData();
 				const nativeCurrency = {
 					name: network.name === 'homestead' ? 'Ether' : network.name,
 					symbol: network.name === 'homestead' ? 'ETH' : 'Unknown',
@@ -196,13 +255,69 @@ export const useSocket = () => {
 			}
 		});
 
+		// Listen for sendTransaction event
+		socketRef.current.on('sendTransaction', async (to: string, value: string, callback) => {
+			console.log('sendTransaction triggered with params:', { to, value });
+			try {
+				if (!window.ethereum) {
+					const errorMsg = 'No crypto wallet found. Please install MetaMask.';
+					callback({ success: false, data: null, error: errorMsg });
+					throw new Error(errorMsg);
+				}
+
+				const provider = new BrowserProvider(window.ethereum);
+				const signer = await provider.getSigner();
+
+				console.log('Got signer for address:', await signer.getAddress());
+				console.log('Sending transaction...');
+
+				const tx = await signer.sendTransaction({
+					to,
+					value: BigInt(value)
+				});
+
+				console.log('Transaction sent, waiting for confirmation:', tx.hash);
+
+				const receipt = await tx.wait();
+
+				if (!receipt) {
+					const errorMsg = 'Transaction receipt is null';
+					callback({ success: false, data: null, error: errorMsg });
+					throw new Error(errorMsg);
+				}
+
+				console.log('Transaction sent:', receipt.hash);
+				callback({ success: true, data: receipt.hash });
+			} catch (error) {
+				console.error(error)
+				const errorMessage = error instanceof Error ? error.message : 'Failed to send transaction';
+				console.error('Error sending transaction:', errorMessage);
+				callback({
+					success: false,
+					data: null,
+					error: errorMessage
+				});
+			}
+		});
+
 		// Cleanup on unmount
 		return () => {
 			if (socketRef.current) {
-				socketRef.current.disconnect();
+				// Remove all event listeners
+				socketRef.current.off('connect', handleConnect);
+				socketRef.current.off('disconnect', handleDisconnect);
+				socketRef.current.off('connect_error', handleConnectError);
+				socketRef.current.off('reconnect', handleReconnect);
+				socketRef.current.off('reconnect_error', handleReconnectError);
+				socketRef.current.off('reconnect_failed', handleReconnectFailed);
+				socketRef.current.off('getStatus');
+				socketRef.current.off('connectWallet');
+				socketRef.current.off('disconnectWallet');
+				socketRef.current.off('changeNetwork');
+				socketRef.current.off('sendTransaction');
 			}
 		};
 	}, []);
 
-	return socketRef.current;
+	return { socket: socketRef.current, isConnected };
 }; 
