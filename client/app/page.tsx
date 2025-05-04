@@ -23,8 +23,10 @@ export default function Home() {
 					</div>
 					<h1 className={styles.title}>Web3 Wallet Bridge</h1>
 					<p className={styles.message}>
-						Your gateway to seamless Web3 interactions. This bridge enables natural language communication with your wallet, making blockchain interactions more intuitive and accessible. Please keep this window open to maintain the connection with your wallet.
+						Your gateway to seamless Web3 interactions. This bridge enables natural language communication with your wallet, making blockchain interactions more intuitive and accessible. <strong>Please keep this window open to maintain the connection with your wallet.</strong>
 					</p>
+					<p><a href="https://github.com/menuRivera/web3-mcp#readme" target="_blank">How to use</a></p>
+
 				</div>
 			</main>
 		</div>
