@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import type { IMessageToServer } from "@shared/messageToServer.type";
 import type { ICallbackParams } from "@shared/callback.type";
+import { chains } from "../config/chains";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -57,6 +58,27 @@ io.on("connection", (socket) => {
 	socket.on('disconnect', () => {
 		// Clean up the wallet connection if the socket disconnects
 		connectedWallets.delete(socket.id);
+	});
+
+	socket.on('getChains', (callback: (response: ICallbackParams) => void) => {
+		try {
+			if (typeof callback === 'function') {
+				const response: ICallbackParams = {
+					success: true,
+					data: chains
+				};
+				callback(response);
+			}
+		} catch (error) {
+			if (typeof callback === 'function') {
+				const response: ICallbackParams = {
+					success: false,
+					data: null,
+					error: error instanceof Error ? error.message : 'Failed to get chains information'
+				};
+				callback(response);
+			}
+		}
 	});
 });
 
