@@ -11,6 +11,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          cd server
+          echo "version=$(bun run -e 'console.log(require("./package.json").version)')" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: v${{ steps.version.outputs.version }}
+          tag_prefix: v
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -31,6 +47,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
           files: |
             server/dist/web3-mcp.exe
             server/dist/web3-mcp-macos
