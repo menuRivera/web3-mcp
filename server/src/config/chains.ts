@@ -16,8 +16,8 @@ export const chains: Record<string, IChainResource> = {
         name: "Polygon",
         chainId: 137,
         currency: {
-            name: "Matic",
-            symbol: "MATIC",
+            name: "POL",
+            symbol: "POL",
             decimals: 18
         },
         rpcUrls: ["https://polygon-rpc.com"],
@@ -33,5 +33,16 @@ export const chains: Record<string, IChainResource> = {
         },
         rpcUrls: ["https://arb1.arbitrum.io/rpc"],
         blockExplorerUrls: ["https://arbiscan.io"]
+    },
+    "arbitrum-sepolia": {
+        name: "Arbitrum Sepolia",
+        chainId: 421614,
+        currency: {
+            name: "Ether",
+            symbol: "ETH",
+            decimals: 18
+        },
+        rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+        blockExplorerUrls: ["https://sepolia.arbiscan.io"]
     }
 }; 
