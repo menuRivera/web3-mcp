@@ -184,7 +184,7 @@ mcp.tool(
 		return {
 			content: [{ 
 				type: "text", 
-				text: `Status:\nActive Account: ${status.activeAccount}\nNetwork: ${status.network.name} (Chain ID: ${status.network.chainId})` 
+				text: `Status:\nActive Account: ${status.activeAccount}\nNetwork: ${status.network.name} (Chain ID: ${status.network.chainId})\nBalance: ${status.balance.native} ${status.network.currency.symbol}`
 			}]
 		}
 	},

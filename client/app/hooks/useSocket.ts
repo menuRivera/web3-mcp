@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { BrowserProvider } from 'ethers';
+import { BrowserProvider, formatUnits } from 'ethers';
 import type { ICallbackParams } from '@shared/callback.type';
 import type { IStatus } from '@shared/status.type';
 import type { INetwork } from '@shared/network.type';
+import { Contract } from 'ethers';
 
 const SOCKET_URL = 'ws://localhost:65001';
 
@@ -93,6 +94,7 @@ export const useSocket = () => {
 
 				// Get current network
 				const network = await provider.getNetwork();
+				console.log('Network:', network);
 
 				// Get accounts
 				const accounts = await provider.send('eth_accounts', []);
@@ -100,11 +102,20 @@ export const useSocket = () => {
 				if (!accounts || accounts.length === 0) {
 					throw new Error('No accounts found');
 				}
+
 				const nativeCurrency = {
 					name: network.name === 'homestead' ? 'Ether' : network.name,
-					symbol: network.name === 'homestead' ? 'ETH' : 'Unknown',
+					symbol: network.name === 'matic' ? 'MATIC' :
+					       network.name === 'polygon' ? 'MATIC' :
+					       network.name === 'arbitrum-one' ? 'ETH' :
+					       network.name === 'arbitrum' ? 'ETH' :
+					       'ETH',
 					decimals: 18 // Standard for most EVM chains
 				};
+
+				// Get native balance and format it
+				const balance = await provider.getBalance(accounts[0]);
+				const nativeBalance = formatUnits(balance, nativeCurrency.decimals);
 
 				const status: IStatus = {
 					activeAccount: accounts[0],
@@ -113,6 +124,10 @@ export const useSocket = () => {
 						chainId: Number(network.chainId),
 						name: network.name,
 						currency: nativeCurrency
+					},
+					balance: {
+						native: nativeBalance,
+						tokens: {} // Empty tokens object since we're not fetching token balances
 					}
 				};
 
