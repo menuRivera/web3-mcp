@@ -162,7 +162,7 @@ mcp.tool(
 	async () => {
 		const success = await disconnectWallet()
 		return {
-			content: [{ type: "text", text: `Wallet connected: ${success}` }]
+			content: [{ type: "text", text: `Wallet disconnected: ${success}` }]
 		}
 	},
 )
