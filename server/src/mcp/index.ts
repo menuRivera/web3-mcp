@@ -8,6 +8,7 @@ import {
 	queryContractState,
 	getStatus
 } from "../websocket/actions";
+import { io } from "../websocket";
 import type { INetwork } from "@shared/network.type";
 import type { IStatus } from "@shared/status.type";
 import { z } from "zod";
@@ -163,6 +164,28 @@ mcp.tool(
 		const success = await disconnectWallet()
 		return {
 			content: [{ type: "text", text: `Wallet disconnected: ${success}` }]
+		}
+	},
+)
+
+mcp.tool(
+	"getStatus",
+	async () => {
+		const socketId = io.sockets.sockets.keys().next().value;
+		if (!socketId) {
+			return {
+				content: [{ 
+					type: "text", 
+					text: "No connected clients found" 
+				}]
+			};
+		}
+		const status = await getStatus(socketId);
+		return {
+			content: [{ 
+				type: "text", 
+				text: `Status:\nActive Account: ${status.activeAccount}\nNetwork: ${status.network.name} (Chain ID: ${status.network.chainId})` 
+			}]
 		}
 	},
 )

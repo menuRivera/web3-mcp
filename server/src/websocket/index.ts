@@ -15,6 +15,9 @@ const io = new Server(httpServer, {
 const connectedWallets = new Map<string, string>(); // socketId -> walletAddress
 
 io.on("connection", (socket) => {
+	// Store the socket ID in the socket data
+	socket.data = { socketId: socket.id };
+
 	socket.on('messageToServer', async (msg: IMessageToServer) => {
 		// Handle messageToServer event
 	});

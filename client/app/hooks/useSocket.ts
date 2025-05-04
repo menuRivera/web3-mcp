@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { BrowserProvider } from 'ethers';
 import type { ICallbackParams } from '@shared/callback.type';
+import type { IStatus } from '@shared/status.type';
 
 const SOCKET_URL = 'ws://localhost:65001';
 
@@ -15,6 +16,55 @@ export const useSocket = () => {
 		// Listen for connect event
 		socketRef.current.on('connect', () => {
 			console.log('Socket connected:', socketRef.current?.id);
+		});
+
+		// Listen for getStatus event
+		socketRef.current.on('getStatus', async (callback: (response: ICallbackParams<IStatus | null>) => void) => {
+			console.log('getStatus triggered');
+			try {
+				if (!window.ethereum) {
+					throw new Error('No crypto wallet found. Please install MetaMask.');
+				}
+
+				// Create a BrowserProvider instance
+				const provider = new BrowserProvider(window.ethereum);
+
+				// Get current network
+				const network = await provider.getNetwork();
+
+				// Get accounts
+				const accounts = await provider.send('eth_accounts', []);
+
+				if (!accounts || accounts.length === 0) {
+					throw new Error('No accounts found');
+				}
+				// Get token data from the network
+				const feeData = await provider.getFeeData();
+				const nativeCurrency = {
+					name: network.name === 'homestead' ? 'Ether' : network.name,
+					symbol: network.name === 'homestead' ? 'ETH' : 'Unknown',
+					decimals: 18 // Standard for most EVM chains
+				};
+
+				const status: IStatus = {
+					activeAccount: accounts[0],
+					accounts,
+					network: {
+						chainId: Number(network.chainId),
+						name: network.name,
+						currency: nativeCurrency
+					}
+				};
+
+				callback({ success: true, data: status });
+			} catch (error) {
+				console.error('Error getting status:', error);
+				callback({
+					success: false,
+					data: null,
+					error: error instanceof Error ? error.message : 'Failed to get status'
+				});
+			}
 		});
 
 		// Listen for walletConnect event
