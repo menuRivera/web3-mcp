@@ -258,6 +258,7 @@ export const useSocket = () => {
 		// Listen for sendTransaction event
 		socketRef.current.on('sendTransaction', async (to: string, value: string, callback) => {
 			console.log('sendTransaction triggered with params:', { to, value });
+
 			try {
 				if (!window.ethereum) {
 					const errorMsg = 'No crypto wallet found. Please install MetaMask.';
