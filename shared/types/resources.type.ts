@@ -1,6 +1,7 @@
 export interface IContractResource {
 	name: string;
-	address: string;
+	chain: string;
+	addresses: Record<string, string>;
 	abi: any[];
 	functions: string[];
 	examples: Array<{

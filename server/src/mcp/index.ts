@@ -13,67 +13,7 @@ import type { INetwork } from "@shared/network.type";
 import type { IStatus } from "@shared/status.type";
 import { z } from "zod";
 import { chains } from "../config/chains";
-import type { IContractResource } from "@shared/resources.type";
-
-// Mock contract data
-const contracts: Record<string, IContractResource> = {
-	"usdc": {
-		name: "USDC",
-		address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-		abi: [
-			{
-				"inputs": [],
-				"name": "decimals",
-				"outputs": [{"type": "uint8"}],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [{"name": "account", "type": "address"}],
-				"name": "balanceOf",
-				"outputs": [{"type": "uint256"}],
-				"stateMutability": "view",
-				"type": "function"
-			}
-		],
-		functions: ["decimals", "balanceOf"],
-		examples: [
-			{
-				functionName: "balanceOf",
-				description: "Get USDC balance of an address",
-				exampleArgs: ["0x1234...5678"]
-			}
-		]
-	},
-	"dai": {
-		name: "DAI",
-		address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-		abi: [
-			{
-				"inputs": [],
-				"name": "decimals",
-				"outputs": [{"type": "uint8"}],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [{"name": "account", "type": "address"}],
-				"name": "balanceOf",
-				"outputs": [{"type": "uint256"}],
-				"stateMutability": "view",
-				"type": "function"
-			}
-		],
-		functions: ["decimals", "balanceOf"],
-		examples: [
-			{
-				functionName: "balanceOf",
-				description: "Get DAI balance of an address",
-				exampleArgs: ["0x1234...5678"]
-			}
-		]
-	}
-};
+import { contracts } from "../contracts/contracts";
 
 // create mcp server and setup tools and resources
 
