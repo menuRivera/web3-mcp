@@ -230,3 +230,43 @@ mcp.tool(
 		};
 	}
 );
+
+mcp.tool(
+	"sendTransaction",
+	{
+		to: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address"),
+		amount: z.string().regex(/^\d+(\.\d+)?$/, "Invalid amount format")
+	},
+	async ({ to, amount }, extra) => {
+		// Get the current network to get the currency decimals
+		const socketId = io.sockets.sockets.keys().next().value;
+		if (!socketId) {
+			return {
+				isError: true,
+				content: [{ type: "text", text: "No connected clients found" }]
+			};
+		}
+
+		const status = await getStatus(socketId);
+		const decimals = status.network.currency.decimals;
+
+		// Format the amount according to the currency decimals
+		const formattedAmount = BigInt(Math.round(parseFloat(amount) * Math.pow(10, decimals))).toString();
+
+		// Send the transaction
+		const txHash = await sendTransaction(to, formattedAmount);
+
+		return {
+			content: [
+				{
+					type: "text",
+					text: `Transaction sent to ${to} for ${amount} ${status.network.currency.symbol}`
+				},
+				{
+					type: "text",
+					text: `Transaction hash: ${txHash}`
+				}
+			]
+		};
+	}
+);
