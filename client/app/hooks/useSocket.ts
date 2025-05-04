@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { BrowserProvider } from 'ethers';
 import type { ICallbackParams } from '@shared/callback.type';
 import type { IStatus } from '@shared/status.type';
+import type { INetwork } from '@shared/network.type';
 
 const SOCKET_URL = 'ws://localhost:65001';
 
@@ -133,6 +134,64 @@ export const useSocket = () => {
 				callback({
 					success: false,
 					error: error instanceof Error ? error.message : 'Failed to disconnect wallet'
+				});
+			}
+		});
+
+		// Listen for changeNetwork event
+		socketRef.current.on('changeNetwork', async (network, callback) => {
+			console.log('changeNetwork triggered');
+			try {
+				if (!window.ethereum) {
+					throw new Error('No crypto wallet found. Please install MetaMask.');
+				}
+
+				try {
+					// Try to switch to the chain
+					await window.ethereum.request({
+						method: 'wallet_switchEthereumChain',
+						params: [{
+							chainId: `0x${network.chainId.toString(16)}`
+						}]
+					});
+				} catch (switchError: any) {
+					// If the chain is not added (error code 4902), add it
+					if (switchError.code === 4902) {
+						try {
+							await window.ethereum.request({
+								method: 'wallet_addEthereumChain',
+								params: [{
+									chainId: `0x${network.chainId.toString(16)}`,
+									chainName: network.name,
+									nativeCurrency: network.currency,
+									rpcUrls: network.rpcUrls,
+									blockExplorerUrls: network.blockExplorerUrls,
+								}]
+							});
+							// Try switching again after adding
+							await window.ethereum.request({
+								method: 'wallet_switchEthereumChain',
+								params: [{
+									chainId: `0x${network.chainId.toString(16)}`
+								}]
+							});
+						} catch (addError: any) {
+							throw new Error(`Failed to add chain: ${addError.message || 'Unknown error'}`);
+						}
+					} else {
+						throw new Error(`Failed to switch chain: ${switchError.message || 'Unknown error'}`);
+					}
+				}
+
+				console.log('Network changed to:', network.name);
+				callback({ success: true, data: null });
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : 'Failed to change network';
+				console.error('Error changing network:', errorMessage);
+				callback({
+					success: false,
+					data: null,
+					error: errorMessage
 				});
 			}
 		});

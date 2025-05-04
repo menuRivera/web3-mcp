@@ -189,3 +189,44 @@ mcp.tool(
 		}
 	},
 )
+
+mcp.tool(
+	"changeNetwork",
+	{ chainName: z.string() },
+	async ({ chainName }, extra) => {
+		// First get the chain from our chains object
+		const chain = chains[chainName as keyof typeof chains];
+		if (!chain) {
+			return {
+				isError: true,
+				content: [{ type: "text", text: `Chain ${chainName} not found` }]
+			};
+		}
+
+		// Perform the network change with all required chain information
+		const success = await changeNetwork({
+			chainId: chain.chainId,
+			name: chain.name,
+			currency: chain.currency,
+			rpcUrls: chain.rpcUrls,
+			blockExplorerUrls: chain.blockExplorerUrls
+		});
+
+		// Return both the chain object and the change result
+		return {
+			content: [
+				{
+					type: "resource",
+					resource: {
+						uri: `chains://${chainName}`,
+						text: JSON.stringify(chain)
+					}
+				},
+				{
+					type: "text",
+					text: `Network changed to ${chain.name}: ${success}`
+				}
+			]
+		};
+	}
+);

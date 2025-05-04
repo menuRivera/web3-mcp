@@ -6,4 +6,6 @@ export interface INetwork {
 		symbol: string,
 		decimals: number,
 	}
+	rpcUrls?: string[],
+	blockExplorerUrls?: string[]
 }
