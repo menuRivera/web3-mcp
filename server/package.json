@@ -2,6 +2,12 @@
 	"name": "web3-mcp-server",
 	"module": "index.ts",
 	"type": "module",
+	"scripts": {
+		"build:win": "bun build --compile --target=bun-windows-x64 ./index.ts --outfile ./dist/web3-mcp.exe",
+		"build:mac": "bun build --compile --target=bun-darwin-x64 ./index.ts --outfile ./dist/web3-mcp-macos",
+		"build:linux": "bun build --compile --target=bun-linux-x64 ./index.ts --outfile ./dist/web3-mcp-linux",
+		"build": "bun run build:win && bun run build:mac && bun run build:linux"
+	},
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
