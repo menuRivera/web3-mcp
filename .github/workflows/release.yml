@@ -1,4 +1,4 @@
-name: Build and Release Server
+name: Build and Release
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
         run: |
           SHA=$(git rev-parse --short HEAD)
           DATE=$(date +%Y%m%d)
-          TAG="release-${DATE}-${SHA}"
+          TAG="${DATE}-${SHA}"
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Using tag: ${TAG}"
 
